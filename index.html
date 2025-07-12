@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>CineDRS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+    }
+
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background-color: #111;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #333;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 24px;
+      color: #f90;
+    }
+
+    header nav button {
+      background-color: transparent;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 8px 16px;
+      margin-left: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    header nav button:hover {
+      background-color: #333;
+    }
+
+    .banner img {
+      width: 100%;
+      max-height: 480px;
+      object-fit: cover;
+      margin-top: 60px;
+      border-bottom: 4px solid #f90;
+    }
+
+    main {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 26px;
+      color: #f90;
+      margin-bottom: 20px;
+    }
+
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 20px;
+      padding-bottom: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .carousel::-webkit-scrollbar {
+      height: 8px;
+    }
+    .carousel::-webkit-scrollbar-thumb {
+      background-color: #f90;
+      border-radius: 4px;
+    }
+    .carousel::-webkit-scrollbar-track {
+      background: #222;
+    }
+
+    .item {
+      background: #1a1a1a;
+      width: 220px;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      flex: 0 0 auto;
+      position: relative;
+      border: 1px solid #333;
+    }
+
+    .item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 6px 16px rgba(255, 153, 0, 0.3);
+    }
+
+    .item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+   .item .info {
+  padding: 12px;
+  background-color: #222;
+  position: relative;
+  height: auto;
+  text-align: center;
+}
+
+.item .descripcion {
+  color: #ccc;
+  font-size: 13px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  margin-top: 8px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+    .item:hover .descripcion {
+      opacity: 1;
+      max-height: 100px;
+    }
+
+    .item button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background-color: #f90;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .item button:hover {
+      background-color: #e68a00;
+    }
+
+    .item button.seleccionado-pelicula {
+      background-color: #0f0 !important;
+      color: #000 !important;
+    }
+
+    .item button.seleccionado-snack {
+      background-color: #0f0 !important;
+      color: #000000 !important;
+    }
+
+    .confirm-btn {
+      padding: 16px 32px;
+      background-color: #f90;
+      border: none;
+      color: #000;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background .2s;
+      margin-top: 20px;
+    }
+
+    .confirm-btn:hover {
+      background-color: #e68a00;
+    }
+
+   #boleta {
+  background: #fff;
+  color: #000;
+  margin-top: 40px;
+  padding: 30px;
+  border: 2px dashed #333;
+  border-radius: 12px;
+  width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+}
+
+    }
+
+    #resumen p {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity .3s;
+      z-index: 200;
+    }
+
+    #modal.open {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    #modal .modal-content {
+      background: #222;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      text-align: left;
+    }
+
+    #modal h3 {
+      color: #f90;
+      margin-bottom: 20px;
+    }
+
+    #modal label {
+      display: block;
+      margin: 12px 0 4px;
+    }
+
+    #modal select {
+      width: 100%;
+      padding: 8px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+
+    #modal .btn-actions {
+      margin-top: 25px;
+      text-align: right;
+    }
+
+    #modal button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+      font-weight: bold;
+    }
+
+    #modal .close-btn {
+      background: #444;
+      color: #fff;
+    }
+
+    #modal .submit-btn {
+      background: #f90;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CineDRS</h1>
+    <nav>
+      <button onclick="abrirModal()">📝 Encuesta</button>
+    </nav>
+  </header>
+
+  <section class="banner">
+    <img src="https://blob.postadeportes.com/images/2025/06/24/f1-pelicula-691e9d26-focus-0-0-1479-828.webp" alt="Banner estreno - Como Entrenar a tu Dragon" />
+  </section>
+
+  <main>
+    <section>
+      <h2>🎬 Elige tu Película</h2>
+      <div class="carousel">
+        <!-- Aquí una por una -->
+        <div class="item">
+          <img src="https://m.media-amazon.com/images/M/MV5BMWFiZjUwZmEtMGVjYi00MjI0LTk5MzAtMjM0MjRkODcyNjI5XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" />
+          <div class="info"><strong>SUPERMAN</strong><div class="descripcion">El icónico superhéroe regresa para enfrentar una nueva amenaza en la Tierra.</div></div>
+          <button onclick="seleccionarPelicula(this, 'Superman')">Seleccionar</button>
+        </div>
+        <div class="item">
+          <img src="https://pics.filmaffinity.com/Jurassic_World_El_renacer-867814667-large.jpg" />
+          <div class="info"><strong>JURASSIC WORLD</strong><div class="descripcion">Los dinosaurios dominan el mundo en esta aventura llena de acción.</div></div>
+          <button onclick="seleccionarPelicula(this, 'Jurassic World')">Seleccionar</button>
+        </div>
+        <div class="item">
+          <img src="https://m.media-amazon.com/images/S/pv-target-images/d6c3d19442144f7678ae5a96a91b6b8759dbb2404b889e2470cafceacbc11438.jpg" />
+          <div class="info"><strong>COMO ENTRENAR A TU DRAGÓN</strong><div class="descripcion">Un joven vikingo descubre la amistad en el dragón más temido del cielo.</div></div>
+          <button onclick="seleccionarPelicula(this, 'Como Entrenar a tu Dragón')">Seleccionar</button>
+        </div>
+        <div class="item">
+          <img src="https://lh4.googleusercontent.com/proxy/9ZOhusvWrC6Waozte8MJIghCZMLn93a1uU4b5fbNLGa6gNUzLiaDnPxXfhUtEGKUipAz3BxCFX99HT9fUKkM12emSkiNHS8GETfqnes" />
+          <div class="info"><strong>EXTERMINIO</strong><div class="descripcion">Una epidemia se expande y la humanidad enfrenta su posible extinción.</div></div>
+          <button onclick="seleccionarPelicula(this, 'Exterminio')">Seleccionar</button>
+        </div>
+        <div class="item">
+          <img src="https://m.media-amazon.com/images/M/MV5BZWFmM2MxYzQtYzI3Ni00NDdmLThhNzAtOGNjNDg2NTU0ZjYxXkEyXkFqcGc@._V1_.jpg" />
+          <div class="info"><strong>AMORES MATERIALISTAS</strong><div class="descripcion">Una historia moderna sobre relaciones marcadas por lo superficial.</div></div>
+          <button onclick="seleccionarPelicula(this, 'Amores Materialistas')">Seleccionar</button>
+        </div>
+        <div class="item">
+          <img src="https://corporacionvisionregional.cl/wp-content/uploads/2023/06/EL-VIAJE-DE-CHIHIRO-1-POSTER-WEB-CINES-717x1024.jpg" />
+          <div class="info"><strong>EL VIAJE DE CHIHIRO</strong><div class="descripcion">Una niña entra a un mundo mágico lleno de espíritus y desafíos inolvidables.</div></div>
+          <button onclick="seleccionarPelicula(this, 'El Viaje de Chihiro')">Seleccionar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SNACKS Y COMBOS -->
+    <section>
+      <h2>🍿 Agrega Snack</h2>
+      <div class="grid" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;">
+        <div class="item">
+          <img src="https://caracol.com.co/resizer/v2/RGY553I2TZH5BC7RJXVDWSC5LQ.jpg?auth=cc03d3c9f060e2253c35408760effa00c3937b136b421ded8c48549423ea738a&width=768&height=576&quality=70&smart=true" />
+          <p>Popcorn Clásico</p>
+          <button onclick="agregarSnack(this, 'Popcorn Clásico')">Agregar</button>
+        </div>
+        <div class="item">
+          <img src="https://freepngimg.com/save/22742-pepsi-file/940x845" />
+          <p>Bebida Gaseosa</p>
+          <button onclick="agregarSnack(this, 'Bebida Gaseosa')">Agregar</button>
+        </div>
+        <div class="item">
+          <img src="https://media.istockphoto.com/id/463751133/es/foto/nachos.jpg?s=612x612&w=0&k=20&c=I1Y0EGNlOAETCOJ-YUXnHj2cvQQs4yRxzMj011gI5as=" />
+          <p>Nachos con Queso</p>
+          <button onclick="agregarSnack(this, 'Nachos con Queso')">Agregar</button>
+        </div>
+        <div class="item">
+          <img src="https://media.istockphoto.com/id/1086056476/es/foto/aperitivos-de-entretenimiento-de-cine.jpg?s=612x612&w=0&k=20&c=6oB1ysztmRDer-MWwDIxnBT9gG9p-Ic_-RjQbICLNDM=" />
+          <p>Combo Clásico<br><small>Popcorn + Bebida</small></p>
+          <button onclick="agregarSnack(this, 'Combo Clásico')">Agregar Combo</button>
+        </div>
+        <div class="item">
+          <img src="https://i5.walmartimages.com.mx/samsmx/images/product-images/img_large/000096234l.jpg" />
+          <p>Combo Hot dog<br><small>Nachos + Hot dog</small></p>
+          <button onclick="agregarSnack(this, 'Combo Hot Dog')">Agregar Combo</button>
+        </div>
+        <div class="item">
+          <img src="https://www.tiendacompensar.com/ccstore/v1/images/?source=/file/v8679865885662258925/products/combo-cineco-gaseosa-palomitas-de-maiz-y-perro-caliente.jpg" />
+          <p>Combo Full<br><small>Popcorn + Hot dog + Bebida</small></p>
+          <button onclick="agregarSnack(this, 'Combo Full')">Agregar Combo</button>
+        </div>
+      </div>
+    </section>
+
+    <button class="confirm-btn" onclick="confirmarCompra()">Confirmar Compra</button>
+
+    <section id="boleta" class="hidden">
+      <h2>🎫 Tu Boleta</h2>
+      <div id="resumen"></div>
+    </section>
+  </main>
+
+  <!-- MODAL -->
+  <div id="modal">
+    <div class="modal-content">
+      <h3>📝 Encuesta sobre la película</h3>
+      <label>1. ¿Qué tan entretenida fue?</label>
+      <select><option>Selecciona</option><option>Muy entretenida</option><option>Entretenida</option><option>Regular</option><option>Aburrida</option></select>
+      <label>2. ¿Actuación?</label>
+      <select><option>Selecciona</option><option>Excelente</option><option>Buena</option><option>Regular</option><option>Mala</option></select>
+      <label>3. ¿Trama?</label>
+      <select><option>Selecciona</option><option>Sí, mucho</option><option>Más o menos</option><option>No</option></select>
+      <label>4. ¿Efectos visuales?</label>
+      <select><option>Selecciona</option><option>Impresionantes</option><option>Buenos</option><option>Regulares</option><option>Malos</option></select>
+      <label>5. ¿Cómo calificas la atención del personal?</label>
+      <select><option>Selecciona</option><option>Impresionante</option><option>Buenos</option><option>Regulares</option><option>Malos</option></select>
+      <label>6. ¿Qué te parece el ambiente (sala)?</label>
+      <select><option>Selecciona</option><option>Impresionante</option><option>Buena</option><option>Regular</option><option>Mala</option></select>
+      <label>7. ¿Volverias nuevamente?</label>
+      <select><option>Selecciona</option><option>Si</option><option>No</option><option></select>
+      <div class="btn-actions">
+        <button class="close-btn" onclick="cerrarModal()">Cancelar</button>
+        <button class="submit-btn" onclick="cerrarModal(); alert('¡Gracias por responder!')">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const modal = document.getElementById('modal');
+    function abrirModal() { modal.classList.add('open'); }
+    function cerrarModal() { modal.classList.remove('open'); }
+
+    let pelicula = null;
+    const snacks = [];
+
+    function seleccionarPelicula(boton, nombre) {
+      pelicula = nombre;
+      document.querySelectorAll('.carousel .item button').forEach(b => b.classList.remove('seleccionado-pelicula'));
+      boton.classList.add('seleccionado-pelicula');
+      alert("🎬 Has elegido: " + nombre);
+    }
+
+    function agregarSnack(boton, nombre) {
+      snacks.push(nombre);
+      boton.classList.add("seleccionado-snack");
+      alert("🍿 Agregado: " + nombre);
+    }
+
+    function confirmarCompra() {
+      if (!pelicula) {
+        alert("Por favor selecciona una película.");
+        return;
+      }
+
+      const precioPelicula = 18;
+      const precioSnack = 10;
+      const total = precioPelicula + (snacks.length * precioSnack);
+
+      let resumen = `<p><strong>🎬 Película:</strong> ${pelicula} (S/ ${precioPelicula.toFixed(2)})</p>`;
+      if (snacks.length > 0) {
+        resumen += `<p><strong>🍿 Snacks:</strong><br>`;
+        snacks.forEach(snack => {
+          resumen += `- ${snack} (S/ ${precioSnack.toFixed(2)})<br>`;
+        });
+        resumen += `</p>`;
+      } else {
+        resumen += `<p><strong>🍿 Snacks:</strong> Ninguno</p>`;
+      }
+
+      resumen += `<p><strong>Total:</strong> S/ ${total.toFixed(2)}</p>`;
+
+      document.getElementById("resumen").innerHTML = resumen;
+      document.getElementById("boleta").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
